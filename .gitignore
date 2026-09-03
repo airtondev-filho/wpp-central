@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+backend/credentials/*.json
+
+# WhatsApp session data
+auth_session/
+auth_session.bak*/
+backend/auth_session/
+backend/auth_session.bak*/
+
+# Build output
+frontend/dist/
+backend/dist/
+
+# Uploads / runtime data
+backend/uploads/
+
+# DB backups
+backups/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store

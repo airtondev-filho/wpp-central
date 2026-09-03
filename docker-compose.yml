@@ -1,0 +1,46 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: wppcentral
+      POSTGRES_USER: wpp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - wpp_central_pgdata_nao_apagar:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    restart: always
+    depends_on: [postgres]
+    ports:
+      - "3002:3001"
+    environment:
+      DATABASE_URL: postgresql://wpp:${POSTGRES_PASSWORD}@postgres:5432/wppcentral
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+      TZ: America/Sao_Paulo
+      PRISMA_QUERY_ENGINE_LIBRARY: /app/node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node
+      GOOGLE_CALENDAR_ID: ${GOOGLE_CALENDAR_ID}
+      GOOGLE_SERVICE_ACCOUNT_KEY_FILE: /app/credentials/google-service-account.json
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      GOOGLE_OAUTH_REDIRECT_URI: ${GOOGLE_OAUTH_REDIRECT_URI}
+      CLICKUP_API_TOKEN: ${CLICKUP_API_TOKEN}
+      CLICKUP_LIST_ID: ${CLICKUP_LIST_ID}
+    volumes:
+      - ./auth_session:/app/auth_session
+      - ./backend/uploads:/app/uploads
+      - ./backend/credentials:/app/credentials:ro
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "8083:80"
+
+volumes:
+  wpp_central_pgdata_nao_apagar:
+    labels:
+      - "keep=true"

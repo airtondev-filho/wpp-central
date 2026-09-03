@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-primeiro-passo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3f5fe"/>
+      <stop offset="55%" stop-color="#b2b6ca"/>
+      <stop offset="100%" stop-color="#595d6c"/>
+    </linearGradient>
+    <filter id="glow-primeiro-passo" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <circle cx="100" cy="100" r="91" fill="none" stroke="#292b31" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="url(#grad-primeiro-passo)" stroke-width="15" filter="url(#glow-primeiro-passo)"/>
+  <circle cx="100" cy="100" r="73" fill="none" stroke="#f3f5fe" stroke-width="1.5" opacity="0.6"/>
+  <g transform="translate(100,100) rotate(0) translate(0,-90)"><path d="M0,-10 L3,-3 L10,-1 L4,3 L5,10 L0,6 L-5,10 L-4,3 L-10,-1 L-3,-3 Z" fill="#f3f5fe"/></g><g transform="translate(100,100) rotate(90) translate(0,-90)"><path d="M0,-10 L3,-3 L10,-1 L4,3 L5,10 L0,6 L-5,10 L-4,3 L-10,-1 L-3,-3 Z" fill="#f3f5fe"/></g><g transform="translate(100,100) rotate(180) translate(0,-90)"><path d="M0,-10 L3,-3 L10,-1 L4,3 L5,10 L0,6 L-5,10 L-4,3 L-10,-1 L-3,-3 Z" fill="#f3f5fe"/></g><g transform="translate(100,100) rotate(270) translate(0,-90)"><path d="M0,-10 L3,-3 L10,-1 L4,3 L5,10 L0,6 L-5,10 L-4,3 L-10,-1 L-3,-3 Z" fill="#f3f5fe"/></g><g transform="translate(100,100) rotate(45) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#b2b6ca"/></g><g transform="translate(100,100) rotate(135) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#b2b6ca"/></g><g transform="translate(100,100) rotate(225) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#b2b6ca"/></g><g transform="translate(100,100) rotate(315) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#b2b6ca"/></g>
+</svg>

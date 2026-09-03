@@ -1,0 +1,486 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SUPERVISOR
+  AGENTE
+  VISUALIZACAO
+}
+
+enum Prioridade {
+  NORMAL
+  ALTO
+  CRITICO
+}
+
+enum StatusAtendimento {
+  ABERTO
+  EM_ATENDIMENTO
+  AGUARDANDO_CLIENTE
+  FINALIZADO
+}
+
+// ── Usuários ─────────────────────────────────────────────────────────────────
+model User {
+  id            Int      @id @default(autoincrement())
+  nome          String
+  email         String   @unique
+  senha         String
+  role          Role     @default(AGENTE)
+  numero        String?
+  avatar        String?
+  ativo         Boolean  @default(true)
+  online        Boolean  @default(false)
+  ultimoAcesso  DateTime?
+  criadoEm      DateTime @default(now())
+  pontos        Int      @default(0)
+  molduraEquipada String?
+  tituloEquipado  String?
+  bannerEquipado  String?
+
+  atendimentos  Atendimento[]
+  mensagens     Mensagem[]
+  notificacoes  Notificacao[]
+  badges          UserBadge[]
+  missoes         UserMissao[]
+  baus            UserBau[]
+  pontosHistorico PontosHistorico[]
+
+  atendimentosRedirecionadosPor Atendimento[]  @relation("AtendimentoRedirecionadoPor")
+
+  quadrosCriados      Quadro[]           @relation("QuadroCriador")
+  quadroMembros       QuadroMembro[]
+  tarefasResponsavel  Tarefa[]           @relation("TarefaResponsavel")
+  tarefasCriadas      Tarefa[]           @relation("TarefaCriador")
+  tarefaComentarios   TarefaComentario[]
+  tarefaAnexos        TarefaAnexo[]
+  tarefaAtividades    TarefaAtividade[]
+  treinamentosInstrutor      Treinamento[]             @relation("TreinamentoInstrutor")
+  treinamentoParticipacoes   TreinamentoParticipante[] @relation("TreinamentoParticipante")
+  requisicoesCriadas         Requisicao[]              @relation("RequisicaoCriador")
+  requisicoesResponsavel     Requisicao[]              @relation("RequisicaoResponsavel")
+  requisicaoAnexos           RequisicaoAnexo[]
+}
+
+// ── Grupos do WhatsApp ───────────────────────────────────────────────────────
+model Grupo {
+  jid           String   @id
+  nome          String
+  logo          String?
+  ativo         Boolean  @default(true)
+  arquivado     Boolean  @default(false)
+
+  // Config de prioridade por grupo (null = usa configuração global)
+  slaNormal     Int?     // minutos até ALTO
+  slaAlto       Int?     // minutos até CRITICO
+
+  criadoEm      DateTime @default(now())
+  atendimentos  Atendimento[]
+  requisicoes   Requisicao[]
+  treinamentos  Treinamento[]
+}
+
+// ── Atendimentos ─────────────────────────────────────────────────────────────
+model Atendimento {
+  id              Int               @id @default(autoincrement())
+  grupo           Grupo             @relation(fields: [grupoJid], references: [jid])
+  grupoJid        String
+  status          StatusAtendimento @default(ABERTO)
+  prioridade      Prioridade        @default(NORMAL)
+
+  // Agente responsável
+  agente          User?             @relation(fields: [agenteId], references: [id])
+  agenteId        Int?
+
+  // Última mensagem
+  ultimaMsg       String?
+  ultimoRemetente String?
+  ultimoTimestamp BigInt            @default(0)
+  ehMinha         Boolean           @default(false)
+
+  // Último agente que respondeu
+  ultimoAgenteNome String?
+
+  // Redirecionamento (admin/supervisor direciona para um agente específico)
+  redirecionadoEm       DateTime?
+  redirecionadoPendente Boolean   @default(false)
+  redirecionadoPor      User?     @relation("AtendimentoRedirecionadoPor", fields: [redirecionadoPorId], references: [id])
+  redirecionadoPorId    Int?
+
+  // Tempos
+  aberturaEm      DateTime          @default(now())
+  primeiraRespostaEm DateTime?
+  finalizadoEm    DateTime?
+  finalizadoPor   String?
+
+  // Contagem
+  totalMensagens  Int               @default(0)
+
+  mensagens       Mensagem[]
+  historico       HistoricoAtendimento[]
+  notificacoes    Notificacao[]
+}
+
+// ── Mensagens ─────────────────────────────────────────────────────────────────
+model Mensagem {
+  id            Int          @id @default(autoincrement())
+  atendimento   Atendimento  @relation(fields: [atendId], references: [id])
+  atendId       Int
+  remetente     String
+  texto         String
+  tipo          String       @default("text") // text, audio, image, sticker, doc
+  ehAgente      Boolean      @default(false)
+  agente        User?        @relation(fields: [agenteId], references: [id])
+  agenteId      Int?
+  timestamp     DateTime     @default(now())
+}
+
+// ── Histórico de mudanças de status/prioridade ───────────────────────────────
+model HistoricoAtendimento {
+  id            Int          @id @default(autoincrement())
+  atendimento   Atendimento  @relation(fields: [atendId], references: [id])
+  atendId       Int
+  tipo          String       // STATUS_CHANGE, PRIORIDADE_CHANGE, AGENTE_CHANGE, MENSAGEM
+  de            String?
+  para          String?
+  descricao     String?
+  criadoEm      DateTime     @default(now())
+}
+
+// ── Configurações globais ────────────────────────────────────────────────────
+model Config {
+  chave         String   @id
+  valor         String
+}
+
+// ── Intenções para automação ─────────────────────────────────────────────────
+model Intencao {
+  id            Int      @id @default(autoincrement())
+  nome          String   @unique
+  descricao     String?
+  ativa         Boolean  @default(true)
+  frases        String[] // array de frases de exemplo
+  criadoEm      DateTime @default(now())
+
+  regras        RegraAutomacao[]
+}
+
+// ── Regras de automação ───────────────────────────────────────────────────────
+model RegraAutomacao {
+  id            Int       @id @default(autoincrement())
+  nome          String
+  ativa         Boolean   @default(true)
+  ordem         Int       @default(0)
+
+  // Gatilho
+  gatilho       String    // MENSAGEM_CLIENTE, MENSAGEM_AGENTE, TEMPO_SEM_RESPOSTA
+  intencao      Intencao? @relation(fields: [intencaoId], references: [id])
+  intencaoId    Int?
+  confiancaMin  Float     @default(0.85) // 0 a 1
+
+  // Ação
+  acao          String    // FINALIZAR, ATRIBUIR_AGENTE, MUDAR_PRIORIDADE, NOTIFICAR_SUPERVISOR
+  acaoValor     String?   // valor adicional para a ação
+
+  criadoEm      DateTime  @default(now())
+}
+
+// ── Tarefas e Treinamentos ────────────────────────────────────────────────────
+enum PrioridadeTarefa {
+  BAIXA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+model Quadro {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  cor         String   @default("#25d366")
+  criador     User     @relation("QuadroCriador", fields: [criadorId], references: [id])
+  criadorId   Int
+  favorito    Boolean  @default(false)
+  ativo       Boolean  @default(true)
+  arquivado   Boolean  @default(false)
+  criadoEm    DateTime @default(now())
+
+  membros     QuadroMembro[]
+  listas      Lista[]
+}
+
+model QuadroMembro {
+  id        Int      @id @default(autoincrement())
+  quadro    Quadro   @relation(fields: [quadroId], references: [id])
+  quadroId  Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  criadoEm  DateTime @default(now())
+
+  @@unique([quadroId, userId])
+}
+
+model Lista {
+  id        Int      @id @default(autoincrement())
+  quadro    Quadro   @relation(fields: [quadroId], references: [id])
+  quadroId  Int
+  nome      String
+  posicao   Int      @default(0)
+  criadoEm  DateTime @default(now())
+
+  tarefas   Tarefa[]
+}
+
+model Tarefa {
+  id            Int              @id @default(autoincrement())
+  lista         Lista            @relation(fields: [listaId], references: [id])
+  listaId       Int
+  titulo        String
+  descricao     String?
+  prioridade    PrioridadeTarefa @default(MEDIA)
+  responsavel   User?            @relation("TarefaResponsavel", fields: [responsavelId], references: [id])
+  responsavelId Int?
+  criador       User             @relation("TarefaCriador", fields: [criadorId], references: [id])
+  criadorId     Int
+  prazo         DateTime?
+  concluidoEm   DateTime?
+  posicao       Int              @default(0)
+  criadoEm      DateTime         @default(now())
+
+  tags          Tag[]
+  checklist     TarefaChecklistItem[]
+  comentarios   TarefaComentario[]
+  anexos        TarefaAnexo[]
+  atividades    TarefaAtividade[]
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement())
+  nome        String       @unique
+  cor         String       @default("#25d366")
+  tarefas     Tarefa[]
+  requisicoes Requisicao[]
+}
+
+model TarefaChecklistItem {
+  id        Int     @id @default(autoincrement())
+  tarefa    Tarefa  @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  tarefaId  Int
+  titulo    String
+  concluido Boolean @default(false)
+  posicao   Int     @default(0)
+}
+
+model TarefaComentario {
+  id        Int       @id @default(autoincrement())
+  tarefa    Tarefa    @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  tarefaId  Int
+  autor     User      @relation(fields: [autorId], references: [id])
+  autorId   Int
+  texto     String
+  criadoEm  DateTime  @default(now())
+  editadoEm DateTime?
+}
+
+model TarefaAnexo {
+  id           Int      @id @default(autoincrement())
+  tarefa       Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  tarefaId     Int
+  nome         String
+  url          String
+  tamanho      Int
+  enviadoPor   User     @relation(fields: [enviadoPorId], references: [id])
+  enviadoPorId Int
+  criadoEm     DateTime @default(now())
+}
+
+model TarefaAtividade {
+  id        Int      @id @default(autoincrement())
+  tarefa    Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
+  tarefaId  Int
+  tipo      String
+  descricao String
+  autor     User     @relation(fields: [autorId], references: [id])
+  autorId   Int
+  criadoEm  DateTime @default(now())
+}
+
+// ── Treinamentos ──────────────────────────────────────────────────────────────
+enum StatusTreinamento {
+  PLANEJADO
+  AGENDADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum StatusParticipante {
+  NAO_INICIADO
+  EM_ANDAMENTO
+  CONCLUIDO
+}
+
+model Treinamento {
+  id          Int               @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  instrutor   User              @relation("TreinamentoInstrutor", fields: [instrutorId], references: [id])
+  instrutorId Int
+  grupo       Grupo?            @relation(fields: [grupoJid], references: [jid])
+  grupoJid    String?
+  data        DateTime?
+  duracaoMin  Int?
+  status      StatusTreinamento @default(PLANEJADO)
+  conteudo    String?
+  observacoes String?
+  materiais   String[]          @default([])
+  criadoEm    DateTime          @default(now())
+  googleEventId String?
+  googleMeetLink String?
+
+  participantes TreinamentoParticipante[]
+}
+
+model TreinamentoParticipante {
+  id            Int                @id @default(autoincrement())
+  treinamento   Treinamento        @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+  treinamentoId Int
+  user          User               @relation("TreinamentoParticipante", fields: [userId], references: [id])
+  userId        Int
+  status        StatusParticipante @default(NAO_INICIADO)
+  concluidoEm   DateTime?
+
+  @@unique([treinamentoId, userId])
+}
+
+// ── Requisições ───────────────────────────────────────────────────────────────
+enum StatusRequisicao {
+  ABERTA
+  EM_ANDAMENTO
+  CONCLUIDA
+}
+
+enum PrioridadeRequisicao {
+  BAIXA
+  NORMAL
+  ALTA
+  URGENTE
+}
+
+model Requisicao {
+  id            Int                  @id @default(autoincrement())
+  nome          String
+  descricao     String?
+  status        StatusRequisicao     @default(ABERTA)
+  prioridade    PrioridadeRequisicao @default(NORMAL)
+  prazo         DateTime?
+
+  // intervalo (em minutos) de repetição do lembrete de proximidade do prazo; null = sem lembrete
+  avisoIntervaloMinutos Int?
+  ultimoAvisoEm         DateTime?
+
+  grupo         Grupo                @relation(fields: [grupoJid], references: [jid])
+  grupoJid      String
+
+  criador       User                 @relation("RequisicaoCriador", fields: [criadorId], references: [id])
+  criadorId     Int
+
+  responsavel   User?                @relation("RequisicaoResponsavel", fields: [responsavelId], references: [id])
+  responsavelId Int?
+
+  // id da task correspondente no ClickUp, preenchido quando a integração de sincronização for implementada
+  clickupTaskId String?
+
+  criadoEm      DateTime             @default(now())
+  concluidoEm   DateTime?
+
+  anexos        RequisicaoAnexo[]
+  tags          Tag[]
+}
+
+model RequisicaoAnexo {
+  id            Int        @id @default(autoincrement())
+  requisicao    Requisicao @relation(fields: [requisicaoId], references: [id], onDelete: Cascade)
+  requisicaoId  Int
+  nome          String
+  url           String
+  tipo          String     // image ou video
+  tamanho       Int
+  enviadoPor    User       @relation(fields: [enviadoPorId], references: [id])
+  enviadoPorId  Int
+  criadoEm      DateTime   @default(now())
+}
+
+// ── Notificações ─────────────────────────────────────────────────────────────
+model Notificacao {
+  id            Int          @id @default(autoincrement())
+  user          User         @relation(fields: [userId], references: [id])
+  userId        Int
+  tipo          String       // NOVA_MENSAGEM, ATEND_CRITICO, ATEND_ALTO, MENÇÃO, REDIRECIONAMENTO
+  titulo        String
+  corpo         String?
+  lida          Boolean      @default(false)
+  criadoEm      DateTime     @default(now())
+
+  // Atendimento relacionado (permite abrir a conversa direto pela notificação)
+  atendimento   Atendimento? @relation(fields: [atendId], references: [id])
+  atendId       Int?
+}
+
+// ── Gamificação ───────────────────────────────────────────────────────────────
+model UserBadge {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  badgeSlug      String
+  desbloqueadoEm DateTime @default(now())
+
+  @@unique([userId, badgeSlug])
+}
+
+model UserMissao {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  missaoSlug     String
+  desbloqueadoEm DateTime @default(now())
+
+  @@unique([userId, missaoSlug])
+}
+
+// Baú concedido ao concluir uma missão. Fica fechado até o agente abrir,
+// e é a abertura (não a conclusão da missão) que libera título/banner/moldura.
+model UserBau {
+  id         Int       @id @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  missaoSlug String
+  ganhoEm    DateTime  @default(now())
+  abertoEm   DateTime?
+
+  @@unique([userId, missaoSlug])
+}
+
+model PontosHistorico {
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  atendimentoId Int?
+  requisicaoId  Int?
+  treinamentoId Int?
+  pontos        Int
+  motivo        String   // ATENDIMENTO_FINALIZADO, REQUISICAO_CADASTRADA, TREINAMENTO_CONCLUIDO
+  criadoEm      DateTime @default(now())
+
+  @@unique([userId, atendimentoId, motivo])
+  @@unique([userId, requisicaoId, motivo])
+  @@unique([userId, treinamentoId, motivo])
+}

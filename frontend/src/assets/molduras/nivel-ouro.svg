@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-nivel-ouro" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf1af"/>
+      <stop offset="55%" stop-color="#f0d24a"/>
+      <stop offset="100%" stop-color="#7a5c0a"/>
+    </linearGradient>
+    <filter id="glow-nivel-ouro" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5.2"/></filter>
+  </defs>
+  <circle cx="100" cy="100" r="91" fill="none" stroke="#5c4306" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="url(#grad-nivel-ouro)" stroke-width="16" filter="url(#glow-nivel-ouro)"/>
+  <circle cx="100" cy="100" r="73" fill="none" stroke="#fdf1af" stroke-width="1.5" opacity="0.6"/>
+  <g transform="translate(100,100) rotate(0) translate(0,-90)"><path d="M-9,6 L-9,-3 L-4.5,1.5 L0,-7 L4.5,1.5 L9,-3 L9,6 Z" fill="#fdf1af"/></g><g transform="translate(100,100) rotate(90) translate(0,-90)"><path d="M-9,6 L-9,-3 L-4.5,1.5 L0,-7 L4.5,1.5 L9,-3 L9,6 Z" fill="#fdf1af"/></g><g transform="translate(100,100) rotate(180) translate(0,-90)"><path d="M-9,6 L-9,-3 L-4.5,1.5 L0,-7 L4.5,1.5 L9,-3 L9,6 Z" fill="#fdf1af"/></g><g transform="translate(100,100) rotate(270) translate(0,-90)"><path d="M-9,6 L-9,-3 L-4.5,1.5 L0,-7 L4.5,1.5 L9,-3 L9,6 Z" fill="#fdf1af"/></g><g transform="translate(100,100) rotate(45) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#f0d24a"/></g><g transform="translate(100,100) rotate(135) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#f0d24a"/></g><g transform="translate(100,100) rotate(225) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#f0d24a"/></g><g transform="translate(100,100) rotate(315) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#f0d24a"/></g>
+</svg>

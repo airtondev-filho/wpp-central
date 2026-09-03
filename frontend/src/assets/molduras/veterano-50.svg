@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-veterano" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8ce9f"/>
+      <stop offset="55%" stop-color="#d98a4f"/>
+      <stop offset="100%" stop-color="#7a4620"/>
+    </linearGradient>
+    <filter id="glow-veterano" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4.4"/></filter>
+  </defs>
+  <circle cx="100" cy="100" r="91" fill="none" stroke="#5c3115" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="url(#grad-veterano)" stroke-width="15" filter="url(#glow-veterano)"/>
+  <circle cx="100" cy="100" r="73" fill="none" stroke="#f8ce9f" stroke-width="1.5" opacity="0.6"/>
+  <g transform="translate(100,100) rotate(0) translate(0,-90)"><path d="M-8,5 L-8,-3 L-4,1 L0,-6 L4,1 L8,-3 L8,5 Z" fill="#f8ce9f"/></g><g transform="translate(100,100) rotate(90) translate(0,-90)"><path d="M-8,5 L-8,-3 L-4,1 L0,-6 L4,1 L8,-3 L8,5 Z" fill="#f8ce9f"/></g><g transform="translate(100,100) rotate(180) translate(0,-90)"><path d="M-8,5 L-8,-3 L-4,1 L0,-6 L4,1 L8,-3 L8,5 Z" fill="#f8ce9f"/></g><g transform="translate(100,100) rotate(270) translate(0,-90)"><path d="M-8,5 L-8,-3 L-4,1 L0,-6 L4,1 L8,-3 L8,5 Z" fill="#f8ce9f"/></g><g transform="translate(100,100) rotate(45) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#d98a4f"/></g><g transform="translate(100,100) rotate(135) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#d98a4f"/></g><g transform="translate(100,100) rotate(225) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#d98a4f"/></g><g transform="translate(100,100) rotate(315) translate(0,-90)"><path d="M0,-6 L5,0 L0,6 L-5,0 Z" fill="#d98a4f"/></g>
+</svg>

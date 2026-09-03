@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #13131b;
+  --surface: #17171f;
+  --surface-strong: #1a1a23;
+  --shadow-dark: rgba(0,0,0,0.65);
+  --shadow-dark-soft: rgba(0,0,0,0.45);
+  --shadow-light: rgba(255,255,255,0.045);
+  --border: rgba(255,255,255,0.04);
+  --text: #f0f0f8;
+  --muted: rgba(255,255,255,0.4);
+  --accent: #a78bfa;
+  --normal: #3b82f6;
+  --alto: #f59e0b;
+  --critico: #ef4444;
+  /* rgb triplet do "ink" (cor de primeiro plano) — permite usar os modificadores
+     de opacidade do Tailwind (ink/40, ink/80...) sobre a mesma variável de tema */
+  --ink-rgb: 240 240 248;
+  /* opacidade do tingimento de .glass — mais alta no tema claro para os cards
+     se destacarem do fundo (ver seletor [data-theme="light"] abaixo) */
+  --glass-alpha: 6%;
+}
+
+/* Tema claro — trocado via data-theme na raiz; a sidebar fica de fora (veja Layout.jsx) */
+[data-theme="light"] {
+  --bg: #e4e4ea;
+  --surface: #f7f7fa;
+  --surface-strong: #eeeef2;
+  --shadow-dark: rgba(148,148,168,0.35);
+  --shadow-dark-soft: rgba(148,148,168,0.22);
+  --shadow-light: rgba(255,255,255,0.9);
+  --border: rgba(0,0,0,0.18);
+  --text: #000000;
+  --muted: rgba(0,0,0,0.62);
+  --ink-rgb: 0 0 0;
+  --glass-alpha: 10%;
+}
+
+/* Blur dos overlays (modais/drawers) — desligado no tema claro a pedido do usuário */
+.overlay-backdrop { backdrop-filter: var(--overlay-blur, 0px); }
+[data-theme="light"] .overlay-backdrop { backdrop-filter: none; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(167,139,250,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.03) 0%, transparent 50%);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* Base surface — flat, no diffuse shadow/glow */
+.glass {
+  background: rgb(var(--ink-rgb) / var(--glass-alpha));
+  border: 1px solid var(--border);
+}
+
+.glass-strong {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+/* Kanban card — ring colorido por prioridade, sem blur */
+.card-normal  { box-shadow: 0 0 0 1px rgba(59,130,246,0.18); }
+.card-alto    { box-shadow: 0 0 0 1px rgba(245,158,11,0.22); }
+.card-critico { box-shadow: 0 0 0 1px rgba(239,68,68,0.3); animation: critico-pulse 2s infinite; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(600deg); opacity: 0.9; }
+}
+
+@keyframes emoji-rain-fall {
+  0%   { transform: translateY(-10vh) translateX(0); opacity: 1; }
+  100% { transform: translateY(110vh) translateX(var(--drift, 0px)); opacity: 0.9; }
+}
+
+@keyframes critico-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(239,68,68,0.3); }
+  50%       { box-shadow: 0 0 0 1px rgba(239,68,68,0.55); }
+}
+
+/* Ampulheta "virando" para status em andamento */
+@keyframes hourglass-flip {
+  0%, 20%   { transform: rotate(0deg); }
+  50%, 70%  { transform: rotate(180deg); }
+  100%      { transform: rotate(360deg); }
+}
+
+.animate-hourglass {
+  display: inline-block;
+  animation: hourglass-flip 2.2s ease-in-out infinite;
+}
+
+/* Treinamento próximo do início — borda pulsando em vermelho */
+@keyframes treinamento-proximo-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(239,68,68,0.35), 0 0 0 0 rgba(239,68,68,0.35); }
+  50%      { box-shadow: 0 0 0 2px rgba(239,68,68,0.9), 0 0 14px 2px rgba(239,68,68,0.45); }
+}
+
+.card-treinamento-proximo {
+  animation: treinamento-proximo-pulse 1.2s ease-in-out infinite;
+}
+
+/* Input — flat surface with border */
+.input-glass {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.input-glass:focus {
+  background: var(--bg);
+  border-color: var(--accent);
+}
+.input-glass::placeholder { color: var(--muted); }
+
+/* <option> não herda cor do <select> em alguns navegadores — sem isso o texto
+   fica preto (cor padrão do SO) mesmo com o fundo escuro do tema dark */
+select option { background: var(--surface); color: var(--text); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--ink-rgb) / 0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--ink-rgb) / 0.2); }
+
+/* Transições suaves */
+* { transition-timing-function: cubic-bezier(0.4,0,0.2,1); }
+
+/* Auth pages: starfield + meteor */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+
+.meteor {
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+  transform: rotate(35deg);
+  animation: meteor-fall 6s ease-in infinite;
+  opacity: 0;
+}
+
+@keyframes meteor-fall {
+  0%   { transform: translate(0, 0) rotate(35deg); opacity: 0; }
+  5%   { opacity: 1; }
+  20%  { transform: translate(160px, 110px) rotate(35deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Abertura de baú — chacoalha, estoura e revela as recompensas como cartas */
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 6s linear infinite; }
+
+@keyframes chest-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  10%      { transform: rotate(-8deg)  scale(1.02); }
+  20%      { transform: rotate(8deg)   scale(1.02); }
+  30%      { transform: rotate(-9deg)  scale(1.04); }
+  40%      { transform: rotate(9deg)   scale(1.05); }
+  50%      { transform: rotate(-11deg) scale(1.06); }
+  60%      { transform: rotate(11deg)  scale(1.07); }
+  70%      { transform: rotate(-12deg) scale(1.08); }
+  80%      { transform: rotate(12deg)  scale(1.09); }
+  90%      { transform: rotate(-5deg)  scale(1.1); }
+}
+.animate-chest-shake { animation: chest-shake 0.75s ease-in-out; }
+
+@keyframes chest-tap {
+  0%   { transform: scale(1)     rotate(0deg); }
+  30%  { transform: scale(0.92)  rotate(-4deg); }
+  60%  { transform: scale(1.06)  rotate(3deg); }
+  100% { transform: scale(1)     rotate(0deg); }
+}
+.animate-chest-tap { animation: chest-tap 0.25s ease-out; }
+
+@keyframes chest-burst {
+  0%   { transform: scale(0.3); opacity: 0.95; }
+  60%  { opacity: 0.55; }
+  100% { transform: scale(3); opacity: 0; }
+}
+.animate-chest-burst { animation: chest-burst 0.5s ease-out forwards; }
+
+@keyframes card-pop {
+  0%   { transform: translateY(50px) scale(0.35) rotate(-10deg); opacity: 0; }
+  55%  { transform: translateY(-8px) scale(1.08) rotate(3deg);   opacity: 1; }
+  100% { transform: translateY(0)    scale(1)    rotate(0deg);   opacity: 1; }
+}
+.animate-card-pop { animation: card-pop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
