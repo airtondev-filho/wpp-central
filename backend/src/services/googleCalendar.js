@@ -11,7 +11,8 @@ export const CONFIG_KEY = 'google_oauth_tokens'
 
 // Conta autorizada via OAuth (uma conta Google de verdade) — necessária para criar
 // salas do Google Meet, algo que uma conta de serviço não tem permissão de fazer.
-async function getOAuthClient() {
+// Exportada para reuso pelo serviço de transcrição do Meet, que só funciona com OAuth.
+export async function getOAuthClient() {
   const config = await prisma.config.findUnique({ where: { chave: CONFIG_KEY } })
   if (!config) return null
 

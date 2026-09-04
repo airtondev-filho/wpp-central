@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -101,7 +101,7 @@ model Atendimento {
   agenteId        Int?
 
   // Última mensagem
-  ultimaMsg       String?
+  ultimaMsg       String?           @db.Text
   ultimoRemetente String?
   ultimoTimestamp BigInt            @default(0)
   ehMinha         Boolean           @default(false)
@@ -135,7 +135,7 @@ model Mensagem {
   atendimento   Atendimento  @relation(fields: [atendId], references: [id])
   atendId       Int
   remetente     String
-  texto         String
+  texto         String       @db.Text
   tipo          String       @default("text") // text, audio, image, sticker, doc
   ehAgente      Boolean      @default(false)
   agente        User?        @relation(fields: [agenteId], references: [id])
@@ -151,23 +151,23 @@ model HistoricoAtendimento {
   tipo          String       // STATUS_CHANGE, PRIORIDADE_CHANGE, AGENTE_CHANGE, MENSAGEM
   de            String?
   para          String?
-  descricao     String?
+  descricao     String?      @db.Text
   criadoEm      DateTime     @default(now())
 }
 
 // ── Configurações globais ────────────────────────────────────────────────────
 model Config {
   chave         String   @id
-  valor         String
+  valor         String   @db.Text
 }
 
 // ── Intenções para automação ─────────────────────────────────────────────────
 model Intencao {
   id            Int      @id @default(autoincrement())
   nome          String   @unique
-  descricao     String?
+  descricao     String?  @db.Text
   ativa         Boolean  @default(true)
-  frases        String[] // array de frases de exemplo
+  frases        Json     @default("[]") // array de frases de exemplo
   criadoEm      DateTime @default(now())
 
   regras        RegraAutomacao[]
@@ -204,7 +204,7 @@ enum PrioridadeTarefa {
 model Quadro {
   id          Int      @id @default(autoincrement())
   nome        String
-  descricao   String?
+  descricao   String?  @db.Text
   cor         String   @default("#25d366")
   criador     User     @relation("QuadroCriador", fields: [criadorId], references: [id])
   criadorId   Int
@@ -244,7 +244,7 @@ model Tarefa {
   lista         Lista            @relation(fields: [listaId], references: [id])
   listaId       Int
   titulo        String
-  descricao     String?
+  descricao     String?          @db.Text
   prioridade    PrioridadeTarefa @default(MEDIA)
   responsavel   User?            @relation("TarefaResponsavel", fields: [responsavelId], references: [id])
   responsavelId Int?
@@ -285,7 +285,7 @@ model TarefaComentario {
   tarefaId  Int
   autor     User      @relation(fields: [autorId], references: [id])
   autorId   Int
-  texto     String
+  texto     String    @db.Text
   criadoEm  DateTime  @default(now())
   editadoEm DateTime?
 }
@@ -295,7 +295,7 @@ model TarefaAnexo {
   tarefa       Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
   tarefaId     Int
   nome         String
-  url          String
+  url          String   @db.Text
   tamanho      Int
   enviadoPor   User     @relation(fields: [enviadoPorId], references: [id])
   enviadoPorId Int
@@ -307,7 +307,7 @@ model TarefaAtividade {
   tarefa    Tarefa   @relation(fields: [tarefaId], references: [id], onDelete: Cascade)
   tarefaId  Int
   tipo      String
-  descricao String
+  descricao String   @db.Text
   autor     User     @relation(fields: [autorId], references: [id])
   autorId   Int
   criadoEm  DateTime @default(now())
@@ -331,7 +331,7 @@ enum StatusParticipante {
 model Treinamento {
   id          Int               @id @default(autoincrement())
   nome        String
-  descricao   String?
+  descricao   String?           @db.Text
   instrutor   User              @relation("TreinamentoInstrutor", fields: [instrutorId], references: [id])
   instrutorId Int
   grupo       Grupo?            @relation(fields: [grupoJid], references: [jid])
@@ -339,12 +339,15 @@ model Treinamento {
   data        DateTime?
   duracaoMin  Int?
   status      StatusTreinamento @default(PLANEJADO)
-  conteudo    String?
-  observacoes String?
-  materiais   String[]          @default([])
+  conteudo    String?           @db.Text
+  observacoes String?           @db.Text
+  materiais   Json              @default("[]")
   criadoEm    DateTime          @default(now())
   googleEventId String?
   googleMeetLink String?
+  transcricao   String?         @db.Text
+  avaliacaoIA   String?         @db.Text
+  avaliacaoIAGeradaEm DateTime?
 
   participantes TreinamentoParticipante[]
 }
@@ -378,7 +381,7 @@ enum PrioridadeRequisicao {
 model Requisicao {
   id            Int                  @id @default(autoincrement())
   nome          String
-  descricao     String?
+  descricao     String?              @db.Text
   status        StatusRequisicao     @default(ABERTA)
   prioridade    PrioridadeRequisicao @default(NORMAL)
   prazo         DateTime?
@@ -411,7 +414,7 @@ model RequisicaoAnexo {
   requisicao    Requisicao @relation(fields: [requisicaoId], references: [id], onDelete: Cascade)
   requisicaoId  Int
   nome          String
-  url           String
+  url           String     @db.Text
   tipo          String     // image ou video
   tamanho       Int
   enviadoPor    User       @relation(fields: [enviadoPorId], references: [id])
@@ -426,7 +429,7 @@ model Notificacao {
   userId        Int
   tipo          String       // NOVA_MENSAGEM, ATEND_CRITICO, ATEND_ALTO, MENÇÃO, REDIRECIONAMENTO
   titulo        String
-  corpo         String?
+  corpo         String?      @db.Text
   lida          Boolean      @default(false)
   criadoEm      DateTime     @default(now())
 

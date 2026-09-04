@@ -4,6 +4,8 @@ import { requireAuth } from '../middleware/auth.js'
 import { io } from '../index.js'
 import { registrarReuniaoConcluida } from '../gamificacao/servico.js'
 import { criarEvento, atualizarEvento, excluirEvento } from '../services/googleCalendar.js'
+import { buscarTranscricao } from '../services/googleMeet.js'
+import { gerarAvaliacao } from '../services/avaliacao/index.js'
 
 const router = Router()
 const prisma = new PrismaClient()
@@ -189,6 +191,36 @@ router.patch('/:id/participantes/:userId', requireAuth, requireTreinamento, asyn
 
   io.emit('treinamento_updated', { treinamentoId: req.treinamento.id })
   res.json(participante)
+})
+
+// POST /api/treinamentos/:id/avaliar-reuniao — busca a transcrição do Meet e gera uma avaliação por IA
+router.post('/:id/avaliar-reuniao', requireAuth, requireTreinamento, requireGerenciar, async (req, res) => {
+  if (!req.treinamento.googleMeetLink)
+    return res.status(400).json({ error: 'Este treinamento não tem uma sala do Google Meet vinculada' })
+
+  const transcricao = await buscarTranscricao(req.treinamento).catch(err => {
+    console.error('Erro ao buscar transcrição do Meet:', err)
+    return null
+  })
+  if (!transcricao?.texto)
+    return res.status(404).json({ error: 'Transcrição não encontrada. Verifique se a transcrição por IA estava habilitada e se a reunião já terminou.' })
+
+  let avaliacaoIA
+  try {
+    avaliacaoIA = await gerarAvaliacao(req.treinamento, transcricao.texto)
+  } catch (err) {
+    console.error('Erro ao gerar avaliação com IA:', err)
+    return res.status(502).json({ error: 'Falha ao gerar a avaliação com IA. Verifique se a ANTHROPIC_API_KEY está configurada.' })
+  }
+
+  const treinamento = await prisma.treinamento.update({
+    where: { id: req.treinamento.id },
+    data: { transcricao: transcricao.texto, avaliacaoIA, avaliacaoIAGeradaEm: new Date() },
+    include: { instrutor: membroSelect, grupo: grupoSelect },
+  })
+
+  io.emit('treinamento_updated', { treinamentoId: treinamento.id })
+  res.json(treinamento)
 })
 
 export default router

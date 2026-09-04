@@ -12,6 +12,7 @@ import StatusTreinamentoBadge from '../components/treinamentos/StatusTreinamento
 import TreinamentoDrawer from '../components/treinamentos/TreinamentoDrawer.jsx'
 import PrioridadeBadge from '../components/tarefas/PrioridadeBadge.jsx'
 import TarefaDrawer from '../components/tarefas/TarefaDrawer.jsx'
+import { useProximidadeInicio } from '../hooks/useProximidadeInicio.js'
 
 const COLS = [
   { key: 'CRITICO', label: 'Crítica', icon: faArrowsRotate,
@@ -37,6 +38,23 @@ function formatAguardando(minutos) {
   const h = Math.floor(minutos / 60), m = minutos % 60
   if (h < 24) return m > 0 ? `${h}h ${m}min` : `${h}h`
   return `${Math.floor(h / 24)}d`
+}
+
+function TreinamentoHojeCard({ t, onAbrir }) {
+  const proximo = useProximidadeInicio(t)
+  return (
+    <button onClick={onAbrir}
+      className={`glass rounded-xl p-4 flex flex-col gap-2 text-left hover:bg-ink/[0.06] transition-colors ${proximo ? 'card-treinamento-proximo' : ''}`}>
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[15px] font-semibold text-ink truncate">{t.nome}</span>
+        <span className="text-sm font-bold text-violet-300 flex-shrink-0">
+          {new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+      <StatusTreinamentoBadge status={t.status} className="self-start" />
+      <span className="text-xs text-ink/40"><FontAwesomeIcon icon={faChalkboardUser} className="mr-1.5" />{t.instrutor?.nome}</span>
+    </button>
+  )
 }
 
 function AtendCard({ a, agentes, podeRedirecionar, onFinalizar, onAtribuir, onRedirecionar, onReabrir, onAbrirChat }) {
@@ -317,17 +335,7 @@ export default function Central() {
             </div>
             <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 pr-1">
               {treinamentosHoje.map(t => (
-                <button key={t.id} onClick={() => setDrawerTreinamentoId(t.id)}
-                  className="glass rounded-xl p-4 flex flex-col gap-2 text-left hover:bg-ink/[0.06] transition-colors">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[15px] font-semibold text-ink truncate">{t.nome}</span>
-                    <span className="text-sm font-bold text-violet-300 flex-shrink-0">
-                      {new Date(t.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  <StatusTreinamentoBadge status={t.status} className="self-start" />
-                  <span className="text-xs text-ink/40"><FontAwesomeIcon icon={faChalkboardUser} className="mr-1.5" />{t.instrutor?.nome}</span>
-                </button>
+                <TreinamentoHojeCard key={t.id} t={t} onAbrir={() => setDrawerTreinamentoId(t.id)} />
               ))}
               {!treinamentosHoje.length && (
                 <div className="text-center py-8 text-ink/20 text-xs">Nenhum treinamento para hoje</div>

@@ -10,6 +10,7 @@
     "db:backfill-agente": "node src/db/backfillAgenteId.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
     "@prisma/client": "^5.14.0",
     "@whiskeysockets/baileys": "^6.7.9",
     "bcryptjs": "^2.4.3",

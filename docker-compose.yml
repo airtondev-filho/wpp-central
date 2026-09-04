@@ -1,23 +1,24 @@
 version: '3.9'
 services:
-  postgres:
-    image: postgres:16-alpine
+  mysql:
+    image: mysql:8
     restart: always
     environment:
-      POSTGRES_DB: wppcentral
-      POSTGRES_USER: wpp
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MYSQL_DATABASE: wppcentral
+      MYSQL_USER: wpp
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - wpp_central_pgdata_nao_apagar:/var/lib/postgresql/data
+      - wpp_central_mysqldata_nao_apagar:/var/lib/mysql
 
   backend:
     build: ./backend
     restart: always
-    depends_on: [postgres]
+    depends_on: [mysql]
     ports:
       - "3002:3001"
     environment:
-      DATABASE_URL: postgresql://wpp:${POSTGRES_PASSWORD}@postgres:5432/wppcentral
+      DATABASE_URL: mysql://wpp:${MYSQL_PASSWORD}@mysql:3306/wppcentral
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3001
       TZ: America/Sao_Paulo
@@ -27,6 +28,10 @@ services:
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       GOOGLE_OAUTH_REDIRECT_URI: ${GOOGLE_OAUTH_REDIRECT_URI}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      AVALIACAO_PROVIDER: ${AVALIACAO_PROVIDER}
+      RAG_API_URL: ${RAG_API_URL}
+      RAG_API_KEY: ${RAG_API_KEY}
       CLICKUP_API_TOKEN: ${CLICKUP_API_TOKEN}
       CLICKUP_LIST_ID: ${CLICKUP_LIST_ID}
     volumes:
@@ -41,6 +46,6 @@ services:
       - "8083:80"
 
 volumes:
-  wpp_central_pgdata_nao_apagar:
+  wpp_central_mysqldata_nao_apagar:
     labels:
       - "keep=true"

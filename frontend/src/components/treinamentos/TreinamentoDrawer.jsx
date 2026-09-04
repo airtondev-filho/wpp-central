@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faTrash, faPlus, faLink, faUserPlus, faVideo } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faTrash, faPlus, faLink, faUserPlus, faVideo, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import { useAuthStore } from '../../stores/index.js'
 import StatusTreinamentoBadge, { STATUS_TREINAMENTO } from './StatusTreinamentoBadge.jsx'
 import ParticipanteStatus, { STATUS_PARTICIPANTE } from './ParticipanteStatus.jsx'
@@ -25,6 +25,8 @@ export default function TreinamentoDrawer({ treinamentoId, usuarios, grupos = []
   const [observacoes, setObservacoes] = useState('')
   const [novoMaterial, setNovoMaterial] = useState('')
   const [novoParticipanteId, setNovoParticipanteId] = useState('')
+  const [avaliando, setAvaliando] = useState(false)
+  const [erroAvaliacao, setErroAvaliacao] = useState('')
 
   const load = useCallback(async () => {
     const r = await fetch(`/api/treinamentos/${treinamentoId}`, { headers: authHeaders() })
@@ -93,6 +95,22 @@ export default function TreinamentoDrawer({ treinamentoId, usuarios, grupos = []
     load(); onChanged?.()
   }
 
+  const avaliarReuniao = async () => {
+    setAvaliando(true)
+    setErroAvaliacao('')
+    try {
+      const r = await fetch(`/api/treinamentos/${treinamentoId}/avaliar-reuniao`, { method: 'POST', headers: authHeaders() })
+      const data = await r.json()
+      if (!r.ok) throw new Error(data.error || 'Falha ao avaliar a reunião')
+      setTreinamento(data)
+      onChanged?.()
+    } catch (err) {
+      setErroAvaliacao(err.message)
+    } finally {
+      setAvaliando(false)
+    }
+  }
+
   const participantesDisponiveis = usuarios.filter(u => !treinamento.participantes.some(p => p.userId === u.id))
   const totalParticipantes = treinamento.participantes.length
   const concluidos = treinamento.participantes.filter(p => p.status === 'CONCLUIDO').length
@@ -140,6 +158,33 @@ export default function TreinamentoDrawer({ treinamentoId, usuarios, grupos = []
               className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-black bg-accent rounded-xl hover:opacity-90 transition-opacity">
               <FontAwesomeIcon icon={faVideo} /> Entrar no Google Meet
             </a>
+          )}
+
+          {/* Avaliação da reunião por IA */}
+          {treinamento.googleMeetLink && podeGerenciar && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs text-ink/40 uppercase tracking-wider">Avaliação da reunião</h4>
+                <button onClick={avaliarReuniao} disabled={avaliando}
+                  className="px-3 py-1.5 text-xs bg-accent text-black font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
+                  <FontAwesomeIcon icon={faWandMagicSparkles} />
+                  {avaliando ? 'Analisando…' : treinamento.avaliacaoIA ? 'Gerar novamente' : 'Avaliar com IA'}
+                </button>
+              </div>
+              {erroAvaliacao && <p className="text-xs text-red-400">{erroAvaliacao}</p>}
+              {treinamento.avaliacaoIA ? (
+                <div className="glass rounded-xl px-4 py-3">
+                  <p className="text-xs text-ink/30 mb-2">
+                    Gerada em {new Date(treinamento.avaliacaoIAGeradaEm).toLocaleString('pt-BR')}
+                  </p>
+                  <pre className="text-sm text-ink/80 whitespace-pre-wrap font-sans">{treinamento.avaliacaoIA}</pre>
+                </div>
+              ) : (
+                !avaliando && <p className="text-xs text-ink/20">
+                  Busca a transcrição do Meet e gera um resumo com pontos fortes e de melhoria.
+                </p>
+              )}
+            </div>
           )}
 
           {/* Campos principais */}
