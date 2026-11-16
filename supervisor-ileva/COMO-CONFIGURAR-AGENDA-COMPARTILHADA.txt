@@ -1,0 +1,22 @@
+AGENDA DE REUNIÕES COMPARTILHADA (Planilha Google) - configurar uma vez
+========================================================================
+1. Com a conta Google da Ileva, crie uma planilha nova (sheets.new). Nome sugerido: "Agenda Supervisor Ileva".
+2. Na planilha: menu Extensões > Apps Script.
+3. Apague o código que aparece e cole todo o conteúdo do arquivo agenda-planilha-google.gs. Clique em Salvar (ícone de disquete).
+4. Clique em "Implantar" > "Nova implantação".
+   - Em "Selecione o tipo" (engrenagem), escolha "App da Web".
+   - Executar como: "Eu".
+   - Quem pode acessar: "Qualquer pessoa".
+   - Clique em Implantar e autorize com a conta Google (pode aparecer "app não verificado": clique em
+     Avançado > Acessar... — é o seu próprio script).
+5. Copie o "URL do app da Web" (termina com /exec) e envie para o Claude, que coloca no Supervisor.
+
+Depois disso:
+- Supervisor (administrador): no Tampermonkey, abra o script "Ileva - Supervisor de Atendimento", apague tudo,
+  cole o conteúdo novo do arquivo instalar-uma-vez-tampermonkey.user.js e salve (Ctrl+S). Só desta vez.
+- Colaboradores: importe de novo o arquivo ileva-supervisor-colaborador.user.js (do Alertas-Ileva-Equipe.zip).
+- Na primeira conexão, o Tampermonkey pode perguntar se o script pode acessar script.google.com:
+  clique em "Sempre permitir".
+
+Segurança: a planilha só guarda cliente, data/hora, responsável e assunto das reuniões. Nenhuma mensagem do WhatsApp
+é enviada. O endereço só aceita pedidos com a chave secreta que está dentro do script.

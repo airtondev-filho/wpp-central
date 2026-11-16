@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configurações · Ileva Supervisor</title>
+<link rel="icon" href="icons/32.png">
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="ws"><img src="icons/48.png" alt=""><div><b>Ileva Supervisor</b><span>Ileva Gestão</span></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="me" id="me"></div>
+  </aside>
+  <div class="mainwrap">
+    <header class="top">
+      <div class="bc">Configurações <span class="sep">/</span> <b id="crumb"></b></div>
+      <div class="tr"><span class="sync" id="sync"></span></div>
+    </header>
+    <main id="main"></main>
+  </div>
+</div>
+<div class="savebar" id="savebar" hidden>
+  <span class="dirty" id="dirtyTxt"></span>
+  <div class="row"><button class="btn" id="discard">Descartar</button><button class="btn p" id="save">Salvar alterações</button></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="config.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Pacotes gerados (recriados pelo build-extensao.py e gerar-versao-colaborador.py)
+*.zip
+extensao-gestor/
+extensao-equipe/
+
+# Histórico manual e materiais de apoio (o Git passa a guardar o histórico)
+versoes-anteriores/
+versao-com-mascote/
+Claude outputs/
+
+# Arquivo do VS Code com caminhos deste computador
+*.code-workspace
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+__pycache__/

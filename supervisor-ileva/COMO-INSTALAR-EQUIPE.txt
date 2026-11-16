@@ -1,0 +1,32 @@
+ALERTAS ILEVA - VERSÃO EQUIPE (colaboradores)
+=============================================
+Mostra no WhatsApp Web os atendimentos em aberto / aguardando resposta, com o menu de prazo
+(urgentes, no prazo, retorno/aguardando). Somente leitura: não envia, não edita e não apaga nada.
+Não tem configurações, revisão de tom, base de conhecimento nem relatórios.
+
+INSTALAÇÃO (uma vez por computador, Google Chrome ou Edge)
+1. Instale a extensão Tampermonkey: https://www.tampermonkey.net
+2. Chrome: abra chrome://extensions, ative "Modo do desenvolvedor" (canto superior direito)
+   e, em Tampermonkey > Detalhes, ative "Permitir scripts do usuário" (se aparecer).
+3. Abra o painel do Tampermonkey > aba "Utilitários" > "Importar de arquivo"
+   e escolha o arquivo: ileva-supervisor-colaborador.user.js  > clique em Instalar.
+   (Ou arraste o arquivo para dentro da janela do Chrome com o painel do Tampermonkey aberto.)
+4. Abra https://web.whatsapp.com e entre com o WhatsApp do colaborador.
+5. Clique no botão "🛡️ Supervisor" no canto da tela e aceite as notificações quando o navegador pedir.
+
+IMPORTANTE
+- O painel lê o WhatsApp daquele computador: o colaborador precisa estar nos grupos de clientes.
+- Na primeira vez, clique em 🔄 para ler o histórico dos grupos (isso abre os grupos e marca como lidos).
+- Atualização: quando houver nova versão, importe o arquivo novo do mesmo jeito (ele substitui o antigo).
+
+OUTRAS ABAS DO NAVEGADOR (a partir da versão com "vitrine")
+- A barra de atendimentos, os alertas de reunião e o mascote aparecem também nas outras abas do navegador.
+- Os dados vêm da aba do WhatsApp Web: deixe-a aberta. Se ela estiver fechada, a barra mostra "WhatsApp fechado".
+- O painel completo continua só na aba do WhatsApp. Nada é lido nem gravado nos outros sites.
+- No Chrome, a extensão Tampermonkey precisa ter acesso "Em todos os sites" (Extensões > Tampermonkey > Detalhes > Acesso ao site).
+
+
+RAIO-X NO MEISTERTASK
+- Na aba 🩻 Raio-X, preencha o Raio-X manual e clique em "🚀 Enviar para o MeisterTask".
+- O card "Raio x Diário" abre e o bloco do seu horário é preenchido sozinho (com a data de hoje), usando o seu login do MeisterTask.
+- Se aparecer o aviso amarelo, clique na descrição do card e cole com Ctrl+V (o texto já fica copiado).
