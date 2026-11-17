@@ -1,0 +1,33 @@
+CHAT DA EQUIPE (GOOGLE CHAT) NO SUPERVISOR ILEVA - feito uma vez só, pelo gestor
+================================================================================
+
+1) PEGAR O LINK DO WEBHOOK NO GOOGLE CHAT
+   - Abra o Google Chat e entre no espaço da equipe.
+   - Clique no NOME DO ESPAÇO (no topo) > "Apps e integrações" > "Webhooks" > "Adicionar webhook".
+   - Nome: Supervisor Ileva  (avatar pode ficar em branco) > Salvar.
+   - Clique nos 3 pontinhos do webhook criado > "Copiar link".
+   (Se não aparecer a opção Webhooks, o administrador do Google Workspace precisa liberar.)
+
+2) COLAR NA PLANILHA DA AGENDA
+   - Abra a planilha da agenda > Extensões > Apps Script.
+   - Apague tudo e cole o conteúdo do arquivo agenda-planilha-google.gs (desta pasta).
+   - Logo no início tem a linha:   const CHAT_WEBHOOK = '';
+     Cole o link copiado ENTRE AS ASPAS, assim:
+     const CHAT_WEBHOOK = 'https://chat.googleapis.com/v1/spaces/.....';
+   - Clique em Salvar (ícone de disquete).
+
+3) PUBLICAR A NOVA VERSÃO
+   - Implantar > Gerenciar implantações > lápis (editar) > Versão: "Nova versão" > Implantar.
+   - Se o Google pedir autorização: Revisar permissões > escolha sua conta > Avançado >
+     Acessar (não seguro) > Permitir. (É o próprio script de vocês.)
+   - O link da planilha continua o mesmo; não precisa mudar nada no Supervisor.
+
+4) TESTAR
+   - Recarregue o WhatsApp (F5) > Supervisor > aba "💬 Equipe" > "🧪 Enviar mensagem de teste".
+   - A mensagem deve aparecer no espaço do Google Chat.
+
+O QUE TEM NA ABA "💬 EQUIPE"
+   - Abrir o chat da equipe: abre o Google Chat numa janela ao lado.
+   - Recado rápido: manda uma mensagem para o espaço, com o nome de quem enviou.
+   - Avisos automáticos (cada um sai uma vez só): cliente esperando há mais de 15 min,
+     reunião começando em 10 min, hora do Raio-X / Raio-X enviado, dia de cobrança.

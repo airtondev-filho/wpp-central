@@ -1,0 +1,39 @@
+ILEVA SUPERVISOR - EXTENSÃO PRÓPRIA (substitui o Tampermonkey)
+==============================================================
+Mesmas funções de hoje, sem depender do Tampermonkey. Funciona no Google Chrome e no Microsoft Edge.
+Enquanto a extensão não for instalada num computador, o sistema atual (Tampermonkey) continua funcionando nele.
+
+QUAL PACOTE USAR
+- Gestor:      pasta  Documentos\IlevaSupervisor\extensao-gestor   (no computador do gestor, já está pronta)
+- Colaborador: arquivo Ileva-Supervisor-Extensao-Equipe.zip
+
+INSTALAÇÃO (uma vez por computador, cerca de 2 minutos)
+1. COLABORADOR: extraia o .zip para C:\Ileva  (fica C:\Ileva\Ileva-Supervisor-Equipe).
+   Essa pasta NÃO pode ser apagada nem movida depois: a extensão roda a partir dela.
+   GESTOR: pule este passo e use a pasta Documentos\IlevaSupervisor\extensao-gestor.
+2. Abra no navegador:  chrome://extensions   (no Edge:  edge://extensions)
+3. Ligue o "Modo do desenvolvedor"  (Chrome: canto superior direito | Edge: menu da esquerda, embaixo).
+4. Clique em "Carregar sem compactação"  (Edge: "Carregar descompactado") e escolha a pasta do passo 1.
+5. Aparece o cartão "Ileva Supervisor" com o logo roxo. Clique no ícone de quebra-cabeça da barra
+   do navegador e no alfinete ao lado de "Ileva Supervisor" para deixá-lo sempre visível.
+6. Ainda em chrome://extensions, no cartão do Tampermonkey > "Detalhes" NÃO precisa desinstalar nada.
+   Basta abrir o painel do Tampermonkey e DESLIGAR o script "Ileva - Supervisor..." (chave cinza).
+   (Dica: abra o WhatsApp Web UMA vez antes de desligar: a extensão copia sozinha as suas reuniões,
+    preferências e tarefas que estavam guardadas no Tampermonkey.)
+7. Recarregue o WhatsApp Web (F5). O painel aparece como sempre.
+
+SE ESQUECER DE DESLIGAR O TAMPERMONKEY
+- Versão nova (8.2.0 ou mais): o Tampermonkey percebe a extensão e fica parado sozinho.
+- Versão antiga: a extensão espera e não abre um segundo painel. Desligue o script no Tampermonkey.
+
+ATUALIZAÇÕES
+- Gestor: automáticas. Quando o core muda, a extensão se recarrega sozinha em até 1 minuto
+  (abas abertas pedem um F5; abas em segundo plano recarregam sozinhas).
+- Colaborador: substitua o conteúdo de C:\Ileva\Ileva-Supervisor-Equipe pelos arquivos do .zip novo.
+  A extensão percebe sozinha em até 1 minuto.
+
+VOLTAR PARA O SISTEMA ANTIGO (se precisar)
+- Em chrome://extensions desligue "Ileva Supervisor" e religue o script no Tampermonkey. F5 no WhatsApp.
+
+O Chrome pode mostrar um aviso sobre "extensões no modo do desenvolvedor": clique no X para fechar.
+NÃO clique em "Desativar".
